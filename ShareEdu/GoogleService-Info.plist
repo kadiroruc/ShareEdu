@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyCxZ0bP74cMdTHp6_Ob7UwA7oSAcUECNDU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>848509171773</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.abdulkadiroruc.ShareEdu</string>
+	<key>PROJECT_ID</key>
+	<string>shareedu-e858e</string>
+	<key>STORAGE_BUCKET</key>
+	<string>shareedu-e858e.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:848509171773:ios:0d12862363c805ab5dd254</string>
+</dict>
+</plist>
