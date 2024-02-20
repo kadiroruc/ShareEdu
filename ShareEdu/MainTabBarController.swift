@@ -10,18 +10,18 @@ import FirebaseAuth
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     
-//    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-//        let index = viewControllers?.firstIndex(of: viewController)
-//        if index == 2{
-//            let photoSelectorController = PhotoSelectorController(collectionViewLayout: UICollectionViewFlowLayout())
-//            let navController = UINavigationController(rootViewController: photoSelectorController)
-//            navController.modalPresentationStyle = .fullScreen
-//            present(navController, animated: true)
-//            return false
-//        }else{
-//            return true
-//        }
-//    }
+    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        let index = viewControllers?.firstIndex(of: viewController)
+        if index == 1{
+            let photoSelectorController = PhotoSelectorController(collectionViewLayout: UICollectionViewFlowLayout())
+            let navController = UINavigationController(rootViewController: photoSelectorController)
+            navController.modalPresentationStyle = .fullScreen
+            present(navController, animated: true)
+            return false
+        }else{
+            return true
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +29,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         
         if Auth.auth().currentUser == nil{
             DispatchQueue.main.async {
+                
                 
                 let loginViewController = LoginViewController()
                 let navController = UINavigationController(rootViewController: loginViewController)
@@ -44,30 +45,29 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     
     func setupViewControllers(){
         //home
-//        let homeNavController = templateNavController(unselectedImage: UIImage(named: "home_unselected")!, selectedImage: UIImage(named: "home_selected")!,rootViewController: HomeController(collectionViewLayout: UICollectionViewFlowLayout()))
+        let homeNavController = templateNavController(unselectedImage: UIImage(named: "home_unselected")!, selectedImage: UIImage(named: "home_selected")!,rootViewController: HomeController(collectionViewLayout: UICollectionViewFlowLayout()))
 
         //search
 //        let searchNavController = templateNavController(unselectedImage: UIImage(named: "search_unselected")!, selectedImage: UIImage(named: "search_selected")!,rootViewController: UserSearchController(collectionViewLayout: UICollectionViewFlowLayout()))
 
         //plus
-//        let plusNavController = templateNavController(unselectedImage: UIImage(named: "plus_unselected")!, selectedImage: UIImage(named: "plus_unselected")!)
+        let plusNavController = templateNavController(unselectedImage: UIImage(named: "plus_unselected")!, selectedImage: UIImage(named: "plus_unselected")!)
         //like
 //        let likeNavController = templateNavController(unselectedImage: UIImage(named: "like_unselected")!, selectedImage: UIImage(named: "like_selected")!)
 
         //userProfile
-        let profileNavController = templateNavController(unselectedImage: UIImage(named: "profile_unselected")!, selectedImage: UIImage(named: "profile_selected")!,rootViewController: UserProfileViewController(collectionViewLayout: UICollectionViewFlowLayout()))
+        let profileNavController = templateNavController(unselectedImage: UIImage(named: "profile_unselected")!, selectedImage: UIImage(named: "profile_selected")!,rootViewController: UserProfileViewController())
 
-
+        let profilePostsController = templateNavController(unselectedImage: UIImage(systemName: "photo.on.rectangle")!, selectedImage: UIImage(systemName: "photo.on.rectangle")!,rootViewController: UserProfilePostsController(collectionViewLayout: UICollectionViewFlowLayout()))
+        
         tabBar.tintColor = .black
         tabBar.backgroundColor = .systemGray5
 
-//        viewControllers = [homeNavController,
-//                           searchNavController,
-//                           plusNavController,
-//                           likeNavController,
-//                           profileNavController]
+
         
-        viewControllers = [profileNavController,
+        viewControllers = [homeNavController,
+                           plusNavController,
+                           profilePostsController,
                            profileNavController]
         //modify tabbar items insets
         guard let items = tabBar.items else{return}

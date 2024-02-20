@@ -1,22 +1,15 @@
 //
-//  UserProfilePhotoCell.swift
+//  PhotoSelectorHeader.swift
 //  InstagramClone
 //
-//  Created by Abdulkadir Oruç on 24.10.2023.
+//  Created by Abdulkadir Oruç on 21.10.2023.
 //
 
 import UIKit
 
-class UserProfilePhotoCell: UICollectionViewCell {
-    var post: Post?{
-        didSet{
-            guard let imageUrl = post?.imageUrl else {return}
-            photoImageView.loadImage(urlString: imageUrl)
-        }
-    }
-    
-    let photoImageView: CustomImageView = {
-        let iv = CustomImageView()
+class PhotoSelectorHeader: UICollectionViewCell{
+    let photoImageView:UIImageView = {
+        let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
         return iv
@@ -24,10 +17,9 @@ class UserProfilePhotoCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        
         addSubview(photoImageView)
         photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
+        
     }
     
     required init?(coder: NSCoder) {

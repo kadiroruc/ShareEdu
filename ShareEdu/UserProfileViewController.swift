@@ -1,52 +1,133 @@
 //
-//  UserProfileViewController.swift
+//  UserProfileViewControllerr.swift
 //  ShareEdu
 //
-//  Created by Abdulkadir Oruç on 19.02.2024.
+//  Created by Abdulkadir Oruç on 20.02.2024.
 //
 
 import UIKit
 import FirebaseAuth
 import FirebaseDatabase
 
-class UserProfileViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
-
-    let cellId = "cellId"
+class UserProfileViewController: UIViewController {
+    
+    var user:User? {
+        didSet{
+            guard let profileImageUrl = user?.profileImageUrl else{return}
+            
+            profileImageView.loadImage(urlString: profileImageUrl)
+            
+            usernameLabel.text = self.user?.username
+            
+            setupEditFollowButton()
+        }
+    }
+    
+    let profileImageView: CustomImageView = {
+        let imageView = CustomImageView()
+        return imageView
+    }()
+    let usernameLabel:UILabel = {
+        let label = UILabel()
+        label.text = "username"
+        label.font = UIFont(name: "helvetica", size: 20)
+        label.textColor = .black
+        label.backgroundColor = .white
+        label.clipsToBounds = true
+        label.layer.borderWidth = 3
+        label.layer.borderColor = UIColor.black.cgColor
+        label.textAlignment = .center
+        label.layer.cornerRadius = 15
+        return label
+    }()
+    let postsLabel:UILabel = {
+        let label = UILabel()
+        
+        let firstString = NSAttributedString(string: "0\n",attributes: [.font : UIFont.boldSystemFont(ofSize: 14),.foregroundColor : UIColor.white])
+        let secondString = NSAttributedString(string: "posts",attributes: [.foregroundColor : UIColor.white,.font : UIFont.boldSystemFont(ofSize: 14)])
+        let combinedString = NSMutableAttributedString(attributedString: firstString)
+        
+        combinedString.append(secondString)
+        label.attributedText = combinedString
+        
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        return label
+    }()
+    let followersLabel:UILabel = {
+        let label = UILabel()
+        let firstString = NSAttributedString(string: "0\n",attributes: [.font : UIFont.boldSystemFont(ofSize: 14),.foregroundColor : UIColor.white])
+        let secondString = NSAttributedString(string: "followers",attributes: [.foregroundColor : UIColor.white,.font : UIFont.boldSystemFont(ofSize: 14)])
+        let combinedString = NSMutableAttributedString(attributedString: firstString)
+        
+        combinedString.append(secondString)
+        label.attributedText = combinedString
+        
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        return label
+    }()
+    let followingLabel:UILabel = {
+        let label = UILabel()
+        let firstString = NSAttributedString(string: "0\n",attributes: [.font : UIFont.boldSystemFont(ofSize: 14),.foregroundColor : UIColor.white])
+        let secondString = NSAttributedString(string: "following",attributes: [.foregroundColor : UIColor.white,.font : UIFont.boldSystemFont(ofSize: 14)])
+        let combinedString = NSMutableAttributedString(attributedString: firstString)
+        
+        combinedString.append(secondString)
+        label.attributedText = combinedString
+        
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        return label
+    }()
+    lazy var editProfileFollowButton:UIButton = {
+        let button = UIButton()
+        button.setTitle("Edit Profile", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
+        button.layer.borderColor = UIColor.black.cgColor
+        button.layer.borderWidth = 3
+        button.layer.cornerRadius = 20
+        button.addTarget(self, action: #selector(handleEditProfileOrFollow), for: .touchUpInside)
+        return button
+    }()
+    
     
     var userId: String?
 
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        collectionView.register(UserProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader , withReuseIdentifier: "headerId")
-        collectionView.register(UserProfilePhotoCell.self, forCellWithReuseIdentifier: cellId)
         
+        setupViews()
         setUpLogOutButton()
         fetchUser()
-    }
-    var posts = [Post]()
-    
-    fileprivate func fetchOrderedPosts(){
-        guard let uid = self.user?.uid else {return}
         
-        let ref = Database.database().reference().child("posts").child(uid)
-        ref.queryOrdered(byChild: "creationDate").observe(.childAdded) {[weak self] snapshot in
-            guard let dictionary = snapshot.value as? [String:Any] else {return}
-            guard let user = self?.user else {return}
-            
-            
-            let post = Post(user: user, dictionary: dictionary)
-            
-            self?.posts.insert(post, at: 0)
-            DispatchQueue.main.async {
-                self?.collectionView.reloadData()
-            }
-        }
+    }
+    func setupViews(){
+        view.backgroundColor = UIColor.rgb(red: 255, green: 49, blue: 48)
+        setUpLogOutButton()
+        
+        view.addSubview(profileImageView)
+        profileImageView.anchor(top: view.topAnchor, left: view.centerXAnchor, bottom: nil, right: nil, paddingTop: 100, paddingLeft: -100, paddingBottom: 0, paddingRight: 0, width: 200, height: 200)
+
+        profileImageView.layer.cornerRadius = 200/2
+        profileImageView.clipsToBounds = true
+        
+        
+        view.addSubview(usernameLabel)
+        usernameLabel.anchor(top: profileImageView.bottomAnchor, left: view.centerXAnchor, bottom: nil, right: nil, paddingTop: 30, paddingLeft: -60, paddingBottom: 0, paddingRight: 0, width: 120, height: 30)
+        
+        setupUsersStatsView()
+        
+        view.addSubview(editProfileFollowButton)
+        editProfileFollowButton.anchor(top: postsLabel.bottomAnchor, left: view.centerXAnchor, bottom: nil, right: nil, paddingTop: 250, paddingLeft: -90, paddingBottom: 0, paddingRight: 0, width: 180, height: 42)
     }
     
     fileprivate func setUpLogOutButton(){
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "gear")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleLogOut))
     }
+    
     @objc func handleLogOut(){
         let ac = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         ac.addAction(UIAlertAction(title: "Log Out", style: .destructive,handler: {[weak self] _ in
@@ -66,49 +147,82 @@ class UserProfileViewController: UICollectionViewController, UICollectionViewDel
         present(ac,animated: true)
     }
     
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return posts.count
+    fileprivate func setupUsersStatsView(){
+        let stackView = UIStackView(arrangedSubviews: [postsLabel,followersLabel,followingLabel])
+        stackView.distribution = .fillEqually
+        view.addSubview(stackView)
+        stackView.anchor(top: usernameLabel.bottomAnchor, left: view.centerXAnchor, bottom: nil, right: nil, paddingTop: 30, paddingLeft: -100, paddingBottom: 0, paddingRight: 0, width: 200, height: 50)
     }
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! UserProfilePhotoCell
+    
+    @objc func handleEditProfileOrFollow(){
+        guard let currentUserId = Auth.auth().currentUser?.uid else {return}
+        guard let userId = user?.uid else {return}
         
-        cell.post = posts[indexPath.item]
-        return cell
+        if editProfileFollowButton.titleLabel?.text == "Unfollow"{
+            //unfollow
+            Database.database().reference().child("following").child(currentUserId).child(userId).removeValue {[weak self] error, ref in
+                if let error = error{
+                    print("Failed to unfollow user",error)
+                    return
+                }
+                DispatchQueue.main.async {
+                    self?.setupFollowStyle()
+                }
+            }
+        }else{
+            //follow
+            let ref = Database.database().reference().child("following").child(currentUserId)
+            let values = [userId:1]
+            ref.updateChildValues(values) {[weak self] error, ref in
+                if let error = error{
+                    print("Failed to follow user",error)
+                    return
+                }
+                DispatchQueue.main.async {
+                    self?.editProfileFollowButton.setTitle("Unfollow", for: .normal)
+                    self?.editProfileFollowButton.backgroundColor = .white
+                    self?.editProfileFollowButton.setTitleColor(.black, for: .normal)
+                }
+            }
+        }
     }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 1
-    }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 1
-    }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (view.frame.width-2)/3
-        return CGSize(width: width, height: width)
+    fileprivate func setupFollowStyle(){
+        self.editProfileFollowButton.setTitle("Follow", for: .normal)
+        self.editProfileFollowButton.backgroundColor = UIColor.rgb(red: 17, green: 154, blue: 237)
+        self.editProfileFollowButton.setTitleColor(.white, for: .normal)
+        self.editProfileFollowButton.layer.borderColor = UIColor(white: 0, alpha: 0.2).cgColor
     }
     
-    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "headerId", for: indexPath) as! UserProfileHeader
-        header.user = self.user
-        
-        return header
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: view.frame.width, height: 200)
-    }
-    
-    var user:User?
     fileprivate func fetchUser(){
         let uid = userId ?? (Auth.auth().currentUser?.uid ?? "")
         
         Database.fetchUserWithUID(uid: uid) {[weak self] user in
             self?.user = user
             
-            DispatchQueue.main.async {
-                self?.collectionView.reloadData()
-                //self?.fetchOrderedPosts()
+        }
+    }
+    
+    fileprivate func setupEditFollowButton(){
+        guard let currentUserId = Auth.auth().currentUser?.uid else {return}
+        guard let userId = user?.uid else {return}
+        
+        if currentUserId != userId{
+            
+            //check if following
+            Database.database().reference().child("following").child(currentUserId).child(userId).observeSingleEvent(of: .value) {[weak self] snapshot in
+                
+                if let isFollowing = snapshot.value as? Int, isFollowing == 1{
+                    DispatchQueue.main.async {
+                        self?.editProfileFollowButton.setTitle("Unfollow", for: .normal)
+                    }
+                }else{
+                    DispatchQueue.main.async {
+                        self?.setupFollowStyle()
+                    }
+                }
             }
         }
     }
-}
+    
 
+}
