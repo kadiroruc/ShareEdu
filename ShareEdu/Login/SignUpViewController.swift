@@ -1,8 +1,8 @@
 //
 //  ViewController.swift
-//  InstagramClone
+//  ShareEdu
 //
-//  Created by Abdulkadir Oruç on 27.09.2023.
+//  Created by Abdulkadir Oruç on 18.02.2024.
 //
 
 import UIKit
@@ -106,7 +106,7 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate, U
     let alreadyHaveAccountButton: UIButton={
         let button = UIButton()
         let firstString = NSAttributedString(string: "Already have an account?",attributes: [.font:UIFont.systemFont(ofSize: 14),.foregroundColor:UIColor.lightGray])
-        let secondString = NSAttributedString(string: " Sign In",attributes: [.font:UIFont.boldSystemFont(ofSize: 14),.foregroundColor:UIColor.rgb(red: 17, green: 154, blue: 237)])
+        let secondString = NSAttributedString(string: " Sign In",attributes: [.font:UIFont.boldSystemFont(ofSize: 14),.foregroundColor:UIColor.black])
         let combinedString = NSMutableAttributedString(attributedString: firstString)
         combinedString.append(secondString)
         button.setAttributedTitle(combinedString, for: .normal)
@@ -199,7 +199,15 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate, U
 //                            guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
 //                            mainTabBarController.setupViewControllers()
 //
-                            self.dismiss(animated: true)
+                            
+                            let userProfileVC = UserProfileViewController()
+                            let user = User(uid: uid, dictionary: dictionaryValues)
+                            userProfileVC.user = user
+                            
+                            let tabbar = MainTabBarController()
+                            tabbar.modalPresentationStyle = .fullScreen
+                            self.present(tabbar,animated: true)
+                            
                         })
                     }
                 }

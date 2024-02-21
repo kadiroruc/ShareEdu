@@ -12,7 +12,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         let index = viewControllers?.firstIndex(of: viewController)
-        if index == 1{
+        if index == 2{
             let photoSelectorController = PhotoSelectorController(collectionViewLayout: UICollectionViewFlowLayout())
             let navController = UINavigationController(rootViewController: photoSelectorController)
             navController.modalPresentationStyle = .fullScreen
@@ -48,17 +48,18 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         let homeNavController = templateNavController(unselectedImage: UIImage(named: "home_unselected")!, selectedImage: UIImage(named: "home_selected")!,rootViewController: HomeController(collectionViewLayout: UICollectionViewFlowLayout()))
 
         //search
-//        let searchNavController = templateNavController(unselectedImage: UIImage(named: "search_unselected")!, selectedImage: UIImage(named: "search_selected")!,rootViewController: UserSearchController(collectionViewLayout: UICollectionViewFlowLayout()))
+        let searchNavController = templateNavController(unselectedImage: UIImage(named: "search_unselected")!, selectedImage: UIImage(named: "search_selected")!,rootViewController: UserSearchController(collectionViewLayout: UICollectionViewFlowLayout()))
 
         //plus
         let plusNavController = templateNavController(unselectedImage: UIImage(named: "plus_unselected")!, selectedImage: UIImage(named: "plus_unselected")!)
-        //like
-//        let likeNavController = templateNavController(unselectedImage: UIImage(named: "like_unselected")!, selectedImage: UIImage(named: "like_selected")!)
+        
+        //requests
+        let requestNavController = templateNavController(unselectedImage: UIImage(named: "list")!, selectedImage: UIImage(named: "list")!,rootViewController: RequestsCollectionViewController(collectionViewLayout: UICollectionViewFlowLayout()))
 
         //userProfile
         let profileNavController = templateNavController(unselectedImage: UIImage(named: "profile_unselected")!, selectedImage: UIImage(named: "profile_selected")!,rootViewController: UserProfileViewController())
 
-        let profilePostsController = templateNavController(unselectedImage: UIImage(systemName: "photo.on.rectangle")!, selectedImage: UIImage(systemName: "photo.on.rectangle")!,rootViewController: UserProfilePostsController(collectionViewLayout: UICollectionViewFlowLayout()))
+
         
         tabBar.tintColor = .black
         tabBar.backgroundColor = .systemGray5
@@ -66,8 +67,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
 
         
         viewControllers = [homeNavController,
+                           searchNavController,
                            plusNavController,
-                           profilePostsController,
+                           requestNavController,
                            profileNavController]
         //modify tabbar items insets
         guard let items = tabBar.items else{return}

@@ -88,9 +88,6 @@ class LoginViewController: UIViewController {
                 return
             }
             print("Successfully logged in")
-//            guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
-//            mainTabBarController.setupViewControllers()
-            
             
             self.dismiss(animated: true)
         }

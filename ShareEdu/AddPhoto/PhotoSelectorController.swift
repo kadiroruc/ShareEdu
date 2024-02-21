@@ -1,8 +1,8 @@
 //
 //  PhotoSelectorController.swift
-//  InstagramClone
+//  ShareEdu
 //
-//  Created by Abdulkadir Oruç on 12.10.2023.
+//  Created by Abdulkadir Oruç on 18.02.2024.
 //
 
 import UIKit

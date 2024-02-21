@@ -1,8 +1,8 @@
 //
 //  CommentsController.swift
-//  InstagramClone
+//  ShareEdu
 //
-//  Created by Abdulkadir Oruç on 3.11.2023.
+//  Created by Abdulkadir Oruç on 18.02.2024.
 //
 
 import UIKit

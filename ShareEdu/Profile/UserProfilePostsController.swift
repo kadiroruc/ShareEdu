@@ -22,6 +22,8 @@ class UserProfilePostsController: UICollectionViewController, UICollectionViewDe
         collectionView.register(UserProfilePhotoCell.self, forCellWithReuseIdentifier: cellId)
         
         fetchUser()
+        
+        navigationController?.navigationBar.tintColor = .black
     }
     var posts = [Post]()
     

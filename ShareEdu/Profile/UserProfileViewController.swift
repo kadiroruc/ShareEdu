@@ -103,6 +103,11 @@ class UserProfileViewController: UIViewController {
         setUpLogOutButton()
         fetchUser()
         
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "photo.stack"), style: .done, target: self, action: #selector(userPostsTapped))
+        navigationItem.leftBarButtonItem?.tintColor = .black
+        
+        
+        
     }
     func setupViews(){
         view.backgroundColor = UIColor.rgb(red: 255, green: 49, blue: 48)
@@ -180,17 +185,14 @@ class UserProfileViewController: UIViewController {
                 }
                 DispatchQueue.main.async {
                     self?.editProfileFollowButton.setTitle("Unfollow", for: .normal)
-                    self?.editProfileFollowButton.backgroundColor = .white
-                    self?.editProfileFollowButton.setTitleColor(.black, for: .normal)
+                    self?.editProfileFollowButton.setTitleColor(.white, for: .normal)
                 }
             }
         }
     }
     fileprivate func setupFollowStyle(){
         self.editProfileFollowButton.setTitle("Follow", for: .normal)
-        self.editProfileFollowButton.backgroundColor = UIColor.rgb(red: 17, green: 154, blue: 237)
         self.editProfileFollowButton.setTitleColor(.white, for: .normal)
-        self.editProfileFollowButton.layer.borderColor = UIColor(white: 0, alpha: 0.2).cgColor
     }
     
     fileprivate func fetchUser(){
@@ -222,6 +224,10 @@ class UserProfileViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    @objc func userPostsTapped(){
+        navigationController?.pushViewController(UserProfilePostsController(collectionViewLayout: UICollectionViewFlowLayout()), animated: true)
     }
     
 

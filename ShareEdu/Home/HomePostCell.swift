@@ -1,15 +1,16 @@
 //
 //  HomePostCell.swift
-//  InstagramClone
+//  ShareEdu
 //
-//  Created by Abdulkadir Oruç on 25.10.2023.
+//  Created by Abdulkadir Oruç on 18.02.2024.
 //
 
 import UIKit
+import FirebaseDatabase
+import FirebaseAuth
 
 protocol HomePostCellDelegate{
     func didTapComment(post: Post)
-    func didLike(for cell: HomePostCell)
 }
 
 class HomePostCell: UICollectionViewCell{
@@ -19,7 +20,6 @@ class HomePostCell: UICollectionViewCell{
     var post: Post?{
         didSet{
             guard let postImageUrl = post?.imageUrl else {return}
-            likeButton.setImage(post?.hasLiked == true ? UIImage(named: "like_selected")?.withRenderingMode(.alwaysOriginal) : UIImage(named: "like_unselected")?.withRenderingMode(.alwaysOriginal), for: .normal)
             
             photoImageView.loadImage(urlString: postImageUrl)
             
@@ -56,32 +56,68 @@ class HomePostCell: UICollectionViewCell{
         button.titleLabel?.font = UIFont.systemFont(ofSize: 44)
         return button
     }()
-    lazy var likeButton: UIButton = {
+
+    let requestButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "like_unselected")?.withRenderingMode(.alwaysOriginal), for: .normal)
-        button.addTarget(self, action: #selector(handleLike), for: .touchUpInside)
+        button.setTitle("Request", for: .normal)
+        button.backgroundColor = UIColor.rgb(red: 255, green: 49, blue: 48)
+        button.layer.cornerRadius = 7
+        button.addTarget(self, action: #selector(requestButtonTapped), for: .touchUpInside)
         return button
     }()
-    @objc func handleLike(){
-        delegate?.didLike(for: self)
+    
+    @objc func requestButtonTapped(){
+        
+        let alertController = UIAlertController(title: "Request", message: nil, preferredStyle: .alert)
+        
+        alertController.addTextField { textField in
+            textField.placeholder = "Your E-Mail"
+        }
+        
+        alertController.addTextField { textField in
+            textField.placeholder = "Message"
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            print("Cancelled.")
+        }
+        
+        let okAction = UIAlertAction(title: "Send", style: .default) { _ in
+            // Tamam seçildiğinde yapılacak işlemler
+            if let email = alertController.textFields?.first?.text, let message = alertController.textFields?.last?.text {
+                
+                self.saveRequestToDatabese(email: email, message: message)
+                // Burada, aldığınız bilgilerle istediğiniz işlemleri yapabilirsiniz.
+            }
+        }
+        
+        alertController.addAction(cancelAction)
+        alertController.addAction(okAction)
+        
+        if let collectionView = superview as? UICollectionView, let viewController = collectionView.delegate as? UIViewController {
+             viewController.present(alertController, animated: true, completion: nil)
+         }
+        
+
     }
     
-    lazy var commentButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(named: "comment")?.withRenderingMode(.alwaysOriginal), for: .normal)
-        button.addTarget(self, action: #selector(handleComment), for: .touchUpInside)
-        return button
-    }()
-    let sendMessageButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(named: "send2")?.withRenderingMode(.alwaysOriginal), for: .normal)
-        return button
-    }()
-    let bookmarkMessageButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(named: "ribbon")?.withRenderingMode(.alwaysOriginal), for: .normal)
-        return button
-    }()
+    func saveRequestToDatabese(email:String, message: String){
+
+        guard let currentUserId = Auth.auth().currentUser?.uid else {return}
+        guard let userId = post?.user.uid else {return}
+        
+        let databaseRef = Database.database().reference()
+            let followRequestRef = databaseRef.child("requests").childByAutoId()
+            
+            let request = ["senderId": currentUserId,
+                           "receiverId": userId,
+                           "status": "pending",
+                           "email": email,
+                           "message": message
+            ]
+            
+            followRequestRef.setValue(request)
+    }
     let captionLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
@@ -132,22 +168,13 @@ class HomePostCell: UICollectionViewCell{
         
         usernameLabel.anchor(top: topAnchor, left: userProfileImageView.rightAnchor, bottom: photoImageView.topAnchor, right: optionsButton.leftAnchor, paddingTop: 0, paddingLeft: 8, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
     
-        setupActionButtons()
+        //setupActionButtons()
+        addSubview(requestButton)
+        requestButton.anchor(top: photoImageView.bottomAnchor, left: leftAnchor, bottom: nil, right: rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 30)
         
         addSubview(captionLabel)
-        captionLabel.anchor(top: likeButton.bottomAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 0, paddingLeft: 8, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
+        captionLabel.anchor(top: requestButton.bottomAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 0, paddingLeft: 8, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
 
-    }
-    fileprivate func setupActionButtons(){
-        let stackView = UIStackView(arrangedSubviews: [likeButton,commentButton,sendMessageButton])
-        stackView.distribution = .fillEqually
-        
-        addSubview(stackView)
-        stackView.anchor(top: photoImageView.bottomAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 0, paddingLeft: 4, paddingBottom: 0, paddingRight: 0, width: 120, height: 40)
-        
-        addSubview(bookmarkMessageButton)
-        bookmarkMessageButton.anchor(top: photoImageView.bottomAnchor, left: nil, bottom: nil, right: rightAnchor, paddingTop: 5, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 40, height: 30)
-        
     }
     
     required init?(coder: NSCoder) {
