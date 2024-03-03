@@ -26,8 +26,9 @@
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-You can watch the usage on Youtube
-https://youtu.be/krVUO4pdLPw
+You can watch the usage on
+<a href ="https://youtu.be/krVUO4pdLPw" target="_blank">Youtube</a>
+
 
 
 <!-- CONTACT -->
